@@ -1,0 +1,173 @@
+class Tetroids
+{
+	field int x,y,x_size,y_size,ansval;
+	
+	constructor Tetroids new(int type)
+	{
+		let y=48;
+		let y_size=8;
+		let x_size=8;
+		let ansval=0;
+		/* Setting the game screen:20*10(height*width)*/
+		do Screen.drawLine(223,47,305,47); //top wall
+		do Screen.drawLine(223,47,223,209); //left wall
+		do Screen.drawLine(305,47,305,209); //right wall
+		do Screen.drawLine(223,209,305,209); //bottom wall
+		
+		if(type = 1)      //long bar
+		{
+			let x=240;
+			let x_size=x_size*4;
+		}
+		return this;
+	}
+	method int ended()
+	{
+		return ansval;
+	}
+	method int clearAhead()
+	{
+		var int address,retval,leftx,rightx;
+		var int cal,rem,neg,itr,tpswap,carry;
+		var Array a;
+		let a=Array.new(16);
+		let itr=0;
+		let carry=1;
+		// move left to right in the game space checking for pixels
+		let leftx=x;
+		let rightx=x+x_size;
+		let ansval=0;
+		while(leftx < rightx)
+		{
+			//next line within the gamespace
+			let address=(16384+(32*(y+y_size+1))+(leftx/16));
+			let retval=Memory.peek(address);
+			if(retval<0)
+			{	
+				let neg=1;
+				let retval=retval*-1;
+			}
+			
+				let itr=0;   
+				while(itr<16)
+				{
+					let a[itr]=0;
+					let itr=itr+1;
+				}
+				let itr=0;
+				while(retval>0)
+				{
+					let cal=retval/2;
+					let rem=retval-(2*cal);
+					let a[itr]=rem;
+					let itr=itr+1;
+					let retval=retval/2;
+				}
+				let itr=0;   
+				while(itr<8)
+				{
+					let tpswap=a[itr];
+					let a[itr]=a[15-itr];
+					let a[15-itr]=tpswap;
+					let itr=itr+1;
+				}
+				if(neg=1)
+				{
+					let itr=0;   
+					while(itr<16)
+					{
+						if(a[itr]=0)
+						{let a[itr]=1;}
+						else{let a[itr]=0;}
+						let itr=itr+1;
+					}
+					let carry=1;
+					let itr=15;
+					while(itr>-1)
+					{
+						if(a[itr]=0 & carry=0)
+						{
+							let a[itr]=0;
+							let carry=0;
+						}
+						if(a[itr]=0 & carry=1)
+						{
+							let a[itr]=1;
+							let carry=0;
+						}
+						if(a[itr]=1 & carry=0)
+						{
+							let a[itr]=1;
+							let carry=0;
+						}
+						if(a[itr]=1 & carry=1)
+						{
+							let a[itr]=0;
+							let carry=1;
+						}
+						let itr=itr-1;
+					}
+				}
+				let cal=leftx/16;
+				let rem=leftx-(16*cal);
+				if(a[rem]=1)
+				{let ansval=1;}
+			let leftx=leftx+1;
+		}
+		if(ansval = 0)
+		{	return 1;}
+		else
+		{ return 0;}
+
+	}
+
+	method void moveDown()
+	{
+		var int clear;
+		let clear=clearAhead();
+		if (clear = 1) 
+		{ 
+        	do Screen.setColor(false);
+         	do Screen.drawRectangle(x,y,x+x_size,y+y_size);
+         	let y = y + (y_size/2);
+         	do Screen.setColor(true);
+         	do Screen.drawRectangle(x,y,x+x_size,y+y_size);
+      	}
+      	do Sys.wait(120);
+      return;
+	}
+
+	/** Moves the tetroid left by 1 block. */
+   method void moveLeft() 
+   {
+   		if ((x-8) > 222)
+   		{
+        	do Screen.setColor(false);
+         	do Screen.drawRectangle(x,y,x+x_size,y+y_size);
+         	let x = x - 8;
+         	do Screen.setColor(true);
+         	do Screen.drawRectangle(x,y,x+x_size,y+y_size);
+      	}
+      	do Sys.wait(5);
+      	return;
+   }
+
+   /** Moves the tetroid right by 1 block. */
+   method void moveRight() 
+   {
+   		if ((x+x_size+8) < 306)
+   		{
+        	do Screen.setColor(false);
+         	do Screen.drawRectangle(x,y,x+x_size,y+y_size);
+         	let x = x + 8;
+         	do Screen.setColor(true);
+         	do Screen.drawRectangle(x,y,x+x_size,y+y_size);
+      	}
+      	do Sys.wait(5);
+      	return;
+   }
+   method void rotate()
+   {
+   		
+   }
+}

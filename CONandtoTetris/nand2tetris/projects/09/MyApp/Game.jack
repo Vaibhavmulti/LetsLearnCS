@@ -1,0 +1,37 @@
+class Game
+{
+	field int inx;
+	constructor Game new()
+	{
+		let inx=0;
+		return this;
+	}
+	method void play()
+	{
+		var Array shapes;
+		var int temp;
+		var Tetroids tp;
+		var char key;  // the key currently pressed by the user
+		let shapes=Array.new(1000);
+		while(true)
+		{
+			let shapes[inx]=Tetroids.new(1);
+			let tp=shapes[inx];
+			let temp=tp.ended();
+			while(temp=0)
+			{
+				do tp.moveDown();
+				let temp=tp.ended();
+				if(~temp)
+				{
+					let key = Keyboard.keyPressed();
+					if (key = 130) { do tp.moveLeft(); }   // left arrow
+         			if (key = 132) { do tp.moveRight(); }   // right arrow
+				}
+			}
+			let inx=inx+1;
+		}
+			
+		return;
+	}
+}

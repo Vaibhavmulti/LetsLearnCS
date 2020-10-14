@@ -1,0 +1,87 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Memory.jack
+
+/**
+ * This library provides two services: direct access to the computer's main
+ * memory (RAM), and allocation and recycling of memory blocks. The Hack RAM
+ * consists of 32,768 words, each holding a 16-bit binary number.
+ */ 
+class Memory {
+
+    static Array ram;
+    static Array heap;
+    static int free,addr;
+    /** Initializes the class. */
+    function void init() {
+    let ram = 0;
+    let heap = 2048;
+    let heap[0] = 0;
+    let heap[1] = 14334;
+    let free = 2048;
+    return;
+    }
+
+    /** Returns the RAM value at the given address. */
+    function int peek(int address) {
+    return ram[address];
+    }
+
+    /** Sets the RAM value at the given address to the given value. */
+    function void poke(int address, int value) {
+    let ram[address] = value;
+    return;
+    }
+
+    /** Finds an available RAM block of the given size and returns
+     *  a reference to its base address. */
+    function void alloc_helper(int size, Array itr)
+    {
+    	let addr = itr[1] - size;
+        let itr[addr -2] = 0;
+        let itr[addr - 1] = size + 2;
+        let itr[1] = itr[1] -(size +2);
+    	return;
+    }
+    function int alloc(int size) {
+    var Array itr, itrn;
+    var int flag;
+    let itr = free;
+    let addr = 0;
+    let flag = 0;
+    if((itr[0] = 0) & (itr[1] > size + 1))
+    {
+    	do Memory.alloc_helper(size, itr);
+    }
+    let itrn = itr[0];
+    while((~(itrn[0] = 0)) & (flag = 0))
+    {
+        if((itrn[1]) > size + 1)
+        {
+        	do Memory.alloc_helper(size, itrn);
+        	let flag = 1;
+        }
+        let itr = itr[0];
+        let itrn = itrn[0];
+    }
+    if(addr = 0)
+    {
+    	do Memory.alloc_helper(size, itrn);
+    }
+    return addr;
+    }
+
+    /** De-allocates the given object (cast as an array) by making
+     *  it available for future allocations. */
+    function void deAlloc(Array o) {
+    var Array itr;
+    let itr = free;
+    while(~(itr[0] = 0))
+    {
+        let itr = itr[0];
+    }
+    let itr[0] = o - 2;
+    return;
+    }    
+}
